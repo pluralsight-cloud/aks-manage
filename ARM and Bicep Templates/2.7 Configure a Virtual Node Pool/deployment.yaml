@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: burst-to-aci
+spec:
+  replicas: 15
+  selector:
+    matchLabels:
+      app: burst-to-aci
+  template:
+    metadata:
+      labels:
+        app: burst-to-aci
+    spec:
+      containers:
+      - name: burst-to-aci
+        image: mcr.microsoft.com/oss/nginx/nginx:1.9.15-alpine
+        ports:
+        - containerPort: 80
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.30.23.60470",
+      "templateHash": "16990375432894206754"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "osDiskSizeGB": 128,
+    "agentVMSize": "Standard_D2s_v3",
+    "osTypeLinux": "Linux"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-11-01",
+      "name": "vnet-aks",
+      "location": "[variables('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.1.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "NodeSubnet",
+            "properties": {
+              "addressPrefix": "10.1.0.0/22"
+            }
+          },
+          {
+            "name": "ACISubnet",
+            "properties": {
+              "addressPrefix": "10.1.4.0/22"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-02-01",
+      "name": "devcluster",
+      "location": "[variables('location')]",
+      "tags": {
+        "displayname": "Dev AKS Cluster"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "dnsPrefix": "devcluster",
+        "networkProfile": {
+          "networkPlugin": "azure"
+        },
+        "agentPoolProfiles": [
+          {
+            "name": "syspool",
+            "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+            "count": 1,
+            "vmSize": "[variables('agentVMSize')]",
+            "osType": "[variables('osTypeLinux')]",
+            "type": "VirtualMachineScaleSets",
+            "mode": "System",
+            "vnetSubnetID": "[reference(resourceId('Microsoft.Network/virtualNetworks', 'vnet-aks'), '2019-11-01').subnets[0].id]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-aks')]"
+      ]
+    }
+  ]
+}

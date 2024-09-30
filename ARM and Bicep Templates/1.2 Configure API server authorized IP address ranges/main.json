@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.30.23.60470",
+      "templateHash": "14733948107752655854"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "osDiskSizeGB": 128,
+    "agentCount": 1,
+    "agentVMSize": "Standard_D2s_v3",
+    "osTypeLinux": "Linux"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/publicIPPrefixes",
+      "apiVersion": "2019-11-01",
+      "name": "ippre-nodepool-publicip",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAddressVersion": "IPv4",
+        "prefixLength": 31
+      }
+    },
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-02-01",
+      "name": "devcluster",
+      "location": "[variables('location')]",
+      "tags": {
+        "displayname": "AKS Cluster"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "dnsPrefix": "devcluster",
+        "agentPoolProfiles": [
+          {
+            "name": "loadbalancer",
+            "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+            "count": "[variables('agentCount')]",
+            "vmSize": "[variables('agentVMSize')]",
+            "osType": "[variables('osTypeLinux')]",
+            "type": "VirtualMachineScaleSets",
+            "mode": "System"
+          },
+          {
+            "name": "publicip",
+            "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+            "count": "[variables('agentCount')]",
+            "vmSize": "[variables('agentVMSize')]",
+            "osType": "[variables('osTypeLinux')]",
+            "type": "VirtualMachineScaleSets",
+            "mode": "System",
+            "enableNodePublicIP": true,
+            "nodePublicIPPrefixID": "[resourceId('Microsoft.Network/publicIPPrefixes', 'ippre-nodepool-publicip')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPPrefixes', 'ippre-nodepool-publicip')]"
+      ]
+    }
+  ]
+}
