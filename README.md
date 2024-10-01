@@ -60,6 +60,7 @@ sudo az aks install-cli
 
 ### Demo: Configure Horizontal Node Scaling
 
+- [Use the cluster autoscaler profile](https://learn.microsoft.com/en-us/azure/aks/cluster-autoscaler?tabs=azure-cli#use-the-cluster-autoscaler-profile)
 - [Demo Files](/ARM%20and%20Bicep%20Templates/2.2%20Configure%20Horizontal%20Node%20Scaling/) used in the Cloud Playground Sandbox.
 - Manually scale using the Azure CLI:
 
