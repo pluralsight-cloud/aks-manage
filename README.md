@@ -29,6 +29,7 @@ az aks create -g <Resource Group> -n <Cluster Name> --generate-ssh-keys --enable
 ### Accessing an AKS Private Cluster
 
 - [Access an AKS private cluster](https://learn.microsoft.com/azure/architecture/guide/security/access-azure-kubernetes-service-cluster-api-server)
+- [Hub and Spoke with Custom DNS](https://learn.microsoft.com/en-us/azure/aks/private-clusters?tabs=default-basic-networking%2Cazure-portal#hub-and-spoke-with-custom-dns)
 
 ### Demo: Access an AKS Private Cluster
 
